@@ -1,7 +1,12 @@
 post:
   operationId: "prepareBeaconProposer"
   summary: Provide beacon node with proposals for the given validators.
+  deprecated: true
   description: |
+    **Deprecated for Gloas and later forks.** Use `POST /eth/v1/validator/proposer_preferences`
+    instead, which provides a signed, gossip-compatible mechanism for communicating
+    fee recipient and gas limit preferences to builders.
+
     Prepares the beacon node for potential proposers by supplying information
     required when proposing blocks for the given validators.  The information
     supplied for each validator index will persist through the epoch in which

@@ -42,6 +42,7 @@ get:
             - execution_payload_available
             - execution_payload_bid
             - payload_attestation_message
+            - proposer_preferences
   responses:
     "200":
       description: Opened SSE stream.

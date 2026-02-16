@@ -1,7 +1,13 @@
 post:
   operationId: "registerValidator"
   summary: Provide beacon node with registrations for the given validators to the external builder network.
+  deprecated: true
   description: |
+    **Deprecated for Gloas and later forks.** Use `POST /eth/v1/validator/proposer_preferences`
+    instead. In Gloas (ePBS), builders are protocol-level participants and proposer
+    preferences are broadcast via the `proposer_preferences` gossip topic. External
+    builder registration is no longer needed.
+
     Prepares the beacon node for engaging with external builders. The
     information must be sent by the beacon node to the builder network. It is
     expected that the validator client will send this information periodically

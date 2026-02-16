@@ -1,0 +1,53 @@
+post:
+  operationId: "submitProposerPreferences"
+  summary: Submit signed proposer preferences to the beacon node for gossip broadcast.
+  description: |
+    Submits signed proposer preferences to the beacon node. The beacon node
+    will validate the preferences and broadcast them to the `proposer_preferences`
+    gossip topic. This allows builders to discover the proposer's preferred
+    `fee_recipient` and `gas_limit` for upcoming proposal slots.
+
+    Validators SHOULD call this endpoint at the beginning of each epoch for
+    all upcoming proposal slots in the next epoch. If a validator does not
+    broadcast preferences for a slot, builders will not submit trustless bids
+    for that slot.
+
+    This endpoint replaces `prepareBeaconProposer` and `registerValidator`
+    for Gloas and later forks.
+  tags:
+    - ValidatorRequiredApi
+    - Validator
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../../beacon-node-oapi.yaml#/components/schemas/Gloas.SignedProposerPreferences'
+      application/octet-stream:
+        schema:
+          description: "SSZ serialized `List[SignedProposerPreferences]` bytes. Use content type header to indicate that SSZ data is contained in the request body."
+  responses:
+    "200":
+      description: |
+        Proposer preferences have been received and will be broadcast.
+    "400":
+      description: |
+        Invalid request. Preferences may be malformed, have invalid signatures,
+        or reference slots outside the accepted range.
+      content:
+        application/json:
+          schema:
+            $ref: "../../beacon-node-oapi.yaml#/components/schemas/ErrorMessage"
+          examples:
+            InvalidSlot:
+              value:
+                code: 400
+                message: "Preferences proposal_slot is not in the current or next epoch"
+            InvalidSignature:
+              value:
+                code: 400
+                message: "Invalid signature for proposer preferences"
+    "500":
+      $ref: "../../beacon-node-oapi.yaml#/components/responses/InternalError"

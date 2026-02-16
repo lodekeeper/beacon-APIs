@@ -1,0 +1,32 @@
+get:
+  operationId: "getPoolProposerPreferences"
+  summary: Get proposer preferences from the operation pool.
+  description: |
+    Retrieves all known signed proposer preferences from the beacon node's
+    operation pool. Builders can use this to discover proposer preferences
+    for upcoming slots.
+  tags:
+    - Beacon
+  parameters:
+    - name: slot
+      in: query
+      required: false
+      description: "Filter by proposal slot. If not specified, returns all known preferences."
+      schema:
+        $ref: "../../../beacon-node-oapi.yaml#/components/schemas/Uint64"
+  responses:
+    "200":
+      description: "Successful response"
+      content:
+        application/json:
+          schema:
+            title: GetPoolProposerPreferencesResponse
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "../../../beacon-node-oapi.yaml#/components/schemas/Gloas.SignedProposerPreferences"
+    "500":
+      $ref: "../../../beacon-node-oapi.yaml#/components/responses/InternalError"

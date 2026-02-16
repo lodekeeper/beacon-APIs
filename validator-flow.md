@@ -69,6 +69,22 @@ PTC Attesting:
 Monitor chain block reorganization events (TBD) as they could change PTC assignments.
 If reorg is detected, ask for new PTC duties and proceed from 1..
 
+### Proposer Preferences (Gloas+)
+
+At the beginning of each epoch (starting from the Gloas fork), validators that have upcoming proposal slots
+in the next epoch SHOULD broadcast their preferences to allow builders to construct valid bids.
+
+1. [Fetch proposer duties](#/Validator/getProposerDuties) for the next epoch to identify upcoming proposal slots
+2. For each upcoming proposal slot, construct `ProposerPreferences` with `fee_recipient` and `gas_limit`
+3. Sign each `ProposerPreferences` to create `SignedProposerPreferences`
+4. [Submit SignedProposerPreferences](#/ValidatorRequiredApi/submitProposerPreferences) to beacon node for gossip broadcast
+
+If a validator does not broadcast preferences for a slot, builders will not submit trustless bids for that slot
+(as the `execution_payload_bid` gossip validation requires a matching `SignedProposerPreferences`).
+
+**Note:** This replaces `prepareBeaconProposer` and `registerValidator` for Gloas and later forks.
+Validators no longer need to separately register with external builder networks.
+
 ### Builder (Optional)
 
 Post-Gloas fork, builders are separate non-validating staked actors that submit execution payload bids for block inclusion.
