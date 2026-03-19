@@ -20,27 +20,30 @@ get:
         type: array
         uniqueItems: true
         items:
-          type: string
-          enum:
-            - head
-            - block
-            - block_gossip
-            - attestation
-            - single_attestation
-            - voluntary_exit
-            - bls_to_execution_change
-            - proposer_slashing
-            - attester_slashing
-            - finalized_checkpoint
-            - chain_reorg
-            - contribution_and_proof
-            - light_client_finality_update
-            - light_client_optimistic_update
-            - payload_attributes
-            - data_column_sidecar
-            - execution_payload_available
-            - execution_payload_bid
-            - payload_attestation_message
+          oneOf:
+            - const: head
+              deprecated: true
+              description: "Deprecated: Use head_v2 instead. Will be removed in a future version."
+            - const: head_v2
+              description: "Enhanced head event with additional fork-aware fields. Replaces head."
+            - const: block
+            - const: block_gossip
+            - const: attestation
+            - const: single_attestation
+            - const: voluntary_exit
+            - const: bls_to_execution_change
+            - const: proposer_slashing
+            - const: attester_slashing
+            - const: finalized_checkpoint
+            - const: chain_reorg
+            - const: contribution_and_proof
+            - const: light_client_finality_update
+            - const: light_client_optimistic_update
+            - const: payload_attributes
+            - const: data_column_sidecar
+            - const: execution_payload_available
+            - const: execution_payload_bid
+            - const: payload_attestation_message
   responses:
     "200":
       description: Opened SSE stream.
@@ -51,10 +54,23 @@ get:
             description: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format
           examples:
             head:
-              description: The node has finished processing, resulting in a new head. previous_duty_dependent_root is `get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch - 1) - 1)` and current_duty_dependent_root is `get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch) - 1)`. Both dependent roots use the genesis block root in the case of underflow.
+              description: "**Deprecated: Use head_v2 instead.** The node has finished processing, resulting in a new head. previous_duty_dependent_root is `get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch - 1) - 1)` and current_duty_dependent_root is `get_block_root_at_slot(state, compute_start_slot_at_epoch(epoch) - 1)`. Both dependent roots use the genesis block root in the case of underflow." 
               value: |
                 event: head
                 data: {"slot":"10", "block":"0x9a2fefd2fdb57f74993c7780ea5b9030d2897b615b89f808011ca5aebed54eaf", "state":"0x600e852a08c1200654ddf11025f1ceacb3c2e74bdd5c630cde0838b2591b69f9", "epoch_transition":false, "previous_duty_dependent_root":"0x5e0043f107cb57913498fbf2f99ff55e730bf1e151f02f221e977c91a90a0e91", "current_duty_dependent_root":"0x5e0043f107cb57913498fbf2f99ff55e730bf1e151f02f221e977c91a90a0e91", "execution_optimistic": false}
+            head_v2:
+              description: |
+                Enhanced head event that replaces the deprecated `head` event. Includes all fields from the
+                original `head` event plus additional fork-aware context. The `version` field indicates the
+                beacon hard fork, allowing consumers to handle fork-specific fields.
+
+                New fields compared to `head`:
+                - `version`: the identifier of the beacon hard fork at the head slot.
+                - `dependent_root`: consolidated duty-dependent root (replaces split previous/current roots).
+                - `optimistic`: renamed from `execution_optimistic` for consistency with other v2 endpoints.
+              value: |
+                event: head_v2
+                data: {"version": "electra", "slot":"10", "block":"0x9a2fefd2fdb57f74993c7780ea5b9030d2897b615b89f808011ca5aebed54eaf", "state":"0x600e852a08c1200654ddf11025f1ceacb3c2e74bdd5c630cde0838b2591b69f9", "epoch_transition":false, "previous_duty_dependent_root":"0x5e0043f107cb57913498fbf2f99ff55e730bf1e151f02f221e977c91a90a0e91", "current_duty_dependent_root":"0x5e0043f107cb57913498fbf2f99ff55e730bf1e151f02f221e977c91a90a0e91", "optimistic": false}
             block:
               description: The node has received a block (from P2P or API) that is successfully imported on the fork-choice `on_block` handler
               value: |
