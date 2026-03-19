@@ -15,35 +15,37 @@ get:
     - name: topics
       in: query
       required: true
-      description: Event types to subscribe to
+      description: |
+        Event types to subscribe to.
+
+        Deprecated events (will be removed in a future version):
+        - `head` - Use `head_v2` instead.
       schema:
         type: array
         uniqueItems: true
         items:
-          oneOf:
-            - const: head
-              deprecated: true
-              description: "Deprecated: Use head_v2 instead. Will be removed in a future version."
-            - const: head_v2
-              description: "Enhanced head event with additional fork-aware fields. Replaces head."
-            - const: block
-            - const: block_gossip
-            - const: attestation
-            - const: single_attestation
-            - const: voluntary_exit
-            - const: bls_to_execution_change
-            - const: proposer_slashing
-            - const: attester_slashing
-            - const: finalized_checkpoint
-            - const: chain_reorg
-            - const: contribution_and_proof
-            - const: light_client_finality_update
-            - const: light_client_optimistic_update
-            - const: payload_attributes
-            - const: data_column_sidecar
-            - const: execution_payload_available
-            - const: execution_payload_bid
-            - const: payload_attestation_message
+          type: string
+          enum:
+            - head
+            - head_v2
+            - block
+            - block_gossip
+            - attestation
+            - single_attestation
+            - voluntary_exit
+            - bls_to_execution_change
+            - proposer_slashing
+            - attester_slashing
+            - finalized_checkpoint
+            - chain_reorg
+            - contribution_and_proof
+            - light_client_finality_update
+            - light_client_optimistic_update
+            - payload_attributes
+            - data_column_sidecar
+            - execution_payload_available
+            - execution_payload_bid
+            - payload_attestation_message
   responses:
     "200":
       description: Opened SSE stream.
